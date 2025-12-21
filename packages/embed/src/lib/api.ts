@@ -1,6 +1,5 @@
 import { joinURL } from "ufo";
 import { API_BASE } from "./consts";
-import { onMount } from "svelte";
 
 export interface Member {
   id: string;
@@ -25,31 +24,17 @@ export async function getEmbed() {
   if (!res.ok) {
     throw new Error(`Failed to fetch /embed: ${res.status}`);
   }
-  const data = await res.json();
-  return data as EmbedResponse;
-}
-
-export default function useEmbed() {
-  let data = $state.raw<EmbedResponse | null>(null);
-
-  onMount(async () => {
-    const res = await fetch(joinURL(API_BASE, "/embed"), {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      // credentials: "include",
-    });
-    if (!res.ok) {
-      throw new Error(`Failed to fetch /embed: ${res.status}`);
+  const data: EmbedResponse = await res.json();
+  console.log(data);
+  if (!data.current) {
+    let message = `Member with url "${location.hostname}" not found in webring`;
+    if (location.hostname === "localhost") {
+      console.warn(message + " (this is expected when developing locally)");
+    } else {
+      console.error(message);
     }
-    data = await res.json();
-  });
-
-  return {
-    get data() {
-      return data;
-    },
-  };
+  }
+  return data;
 }
 
 export async function getStatus() {
@@ -63,8 +48,8 @@ export async function getStatus() {
     throw new Error(`Failed to fetch /embed/status: ${res.status}`);
   }
 
-  const data = await res.json();
-  return data as { enabled: boolean };
+  const data: { enabled: boolean } = await res.json();
+  return data;
 }
 export async function setStatus({ enabled }: { enabled: boolean }) {
   const res = await fetch(joinURL(API_BASE, "/embed/status"), {

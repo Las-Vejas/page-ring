@@ -6,7 +6,7 @@
   import { flower } from "./lib/consts";
   import { ArrowRightIcon } from "@lucide/svelte";
   import { onMount } from "svelte";
-  import { setStatus } from "./lib/api.svelte";
+  import { setStatus } from "./lib/api";
 
   // https://stackoverflow.com/a/79718503/22946386
   const container = $host();

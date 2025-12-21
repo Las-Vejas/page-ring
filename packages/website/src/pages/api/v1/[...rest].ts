@@ -60,25 +60,21 @@ app.get("/embed", async (c) => {
 
   const members = await getAllMembers({ url: new URL(c.req.url) });
 
-  if (
-    originHostname === process.env.VERCEL_PROJECT_PRODUCTION_URL ||
-    originHostname === "localhost"
-  ) {
-    const prev = members[members.length - 1];
-    const next = members[0];
-    return c.json({ current: null, prev, next, members });
-  }
+  let current =
+    members.find((member) => getHostname(member.url) === originHostname) ||
+    null;
 
-  let current = members.find(
-    (member) => getHostname(member.url) === originHostname,
-  );
-  if (!current) {
-    return c.text("Member not found", 404);
-  }
-
-  const { prev, next } = getAdjacentMembers(members, current.id);
-  if (!prev || !next) {
-    return c.text("Member not found", 404);
+  let prev, next;
+  if (current) {
+    const adjacent = getAdjacentMembers(members, current.id);
+    if (!adjacent.prev || !adjacent.next) {
+      return c.text("No adjacent members", 500);
+    }
+    prev = adjacent.prev;
+    next = adjacent.next;
+  } else {
+    prev = members[members.length - 1];
+    next = members[0];
   }
 
   return c.json({
