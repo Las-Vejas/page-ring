@@ -161,7 +161,7 @@
             {#each data.members as member (member.id)}
               <a
                 href={member.url}
-                aria-disabled={data.current.id === member.id}
+                aria-disabled={data.current?.id === member.id}
                 class="ring-link flex items-center gap-2 p-1.5 shadow-none transition group-has-hover:not-hover:opacity-75 hover:bg-teal-100 hover:ring-1 aria-disabled:pointer-events-none"
               >
                 <img
@@ -173,7 +173,7 @@
                 />
                 <div class="min-w-0 flex-1 *:leading-none">
                   <p class="mb-0.5 text-sm font-semibold">{member.name}</p>
-                  {#if data.current.id === member.id}
+                  {#if data.current?.id === member.id}
                     <div class="text-link flex items-center gap-px text-xs">
                       <ChevronRightIcon
                         strokeWidth={2.5}

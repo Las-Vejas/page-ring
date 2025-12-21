@@ -59,15 +59,21 @@ app.get("/embed", async (c) => {
   }
 
   const members = await getAllMembers({ url: new URL(c.req.url) });
+
+  if (
+    originHostname === process.env.VERCEL_PROJECT_PRODUCTION_URL ||
+    originHostname === "localhost"
+  ) {
+    const prev = members[members.length - 1];
+    const next = members[0];
+    return c.json({ current: null, prev, next, members });
+  }
+
   let current = members.find(
     (member) => getHostname(member.url) === originHostname,
   );
   if (!current) {
-    if (import.meta.env.DEV && originHostname === "localhost") {
-      current = members[0];
-    } else {
-      return c.text("Member not found", 404);
-    }
+    return c.text("Member not found", 404);
   }
 
   const { prev, next } = getAdjacentMembers(members, current.id);
@@ -84,6 +90,13 @@ app.get("/embed", async (c) => {
 });
 
 app.get("/embed/status", async (c) => {
+  const origin = c.req.header("Origin");
+  const originHostname = getHostname(origin || "");
+
+  if (originHostname === process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return c.json({ enabled: true });
+  }
+
   const webringCookie = getCookie(c, "webring-enabled");
   const enabled = webringCookie === "true";
   return c.json({ enabled });

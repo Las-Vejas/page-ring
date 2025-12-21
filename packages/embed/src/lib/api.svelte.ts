@@ -10,7 +10,7 @@ export interface Member {
 }
 
 export type EmbedResponse = {
-  current: Member;
+  current?: Member;
   prev: Member;
   next: Member;
   members: Member[];
